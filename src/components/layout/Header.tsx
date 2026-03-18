@@ -14,9 +14,16 @@ export const Header: React.FC = () => {
         </Link>
         
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">Generator</Link>
-          <Link href="#" className="text-sm font-medium hover:text-primary transition-colors opacity-50 cursor-not-allowed">Sudoku (Soon)</Link>
-          <Link href="#" className="text-sm font-medium hover:text-primary transition-colors opacity-50 cursor-not-allowed">Crossword (Soon)</Link>
+          <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">Home</Link>
+          <Link href="/generator" className="text-sm font-medium hover:text-primary transition-colors">Generator</Link>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-muted-foreground opacity-50 cursor-not-allowed">Sudoku</span>
+            <span className="text-[10px] text-primary font-bold -mt-1">SOON</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-muted-foreground opacity-50 cursor-not-allowed">Crossword</span>
+            <span className="text-[10px] text-primary font-bold -mt-1">SOON</span>
+          </div>
         </nav>
 
         <div className="flex items-center gap-4">
