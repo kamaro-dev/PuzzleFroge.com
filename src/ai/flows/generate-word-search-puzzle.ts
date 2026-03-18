@@ -9,9 +9,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-// Assuming src/utils/puzzleGenerator.ts exists and exports the necessary types and functions.
-// This utility will implement the core word search algorithm locally as per project requirements.
-import { generateWordSearchPuzzleAlgorithm, WordPosition as _WordPosition } from '@/utils/puzzleGenerator';
+import { generateWordSearchPuzzleAlgorithm } from '@/utils/puzzleGenerator';
 
 // Define the schema for a single word's position within the grid.
 const WordPositionSchema = z.object({
@@ -22,7 +20,6 @@ const WordPositionSchema = z.object({
   endCol: z.number().describe('The ending column of the word (0-indexed).'),
   direction: z.string().describe('The direction of the word placement (e.g., "horizontal-forward", "vertical-backward", "diagonal-up-right").'),
 });
-// Export the type for external use, consistent with the _WordPosition from the utility.
 export type WordPosition = z.infer<typeof WordPositionSchema>;
 
 /**
@@ -31,8 +28,7 @@ export type WordPosition = z.infer<typeof WordPositionSchema>;
 const GenerateWordSearchPuzzleInputSchema = z.object({
   title: z.string().optional().describe('An optional title for the word search puzzle.'),
   words: z.array(z.string().min(1)).min(1).describe('A list of words to be included in the puzzle. Each word must be at least one character long.'),
-  gridSize: z.union([z.literal(10), z.literal(12), z.literal(15), z.literal(20)])
-    .describe('The desired size of the square puzzle grid (e.g., 10 for a 10x10 grid). Valid sizes are 10, 12, 15, or 20.'),
+  gridSize: z.number().min(8).max(40).describe('The desired size of the square puzzle grid. Must be between 8 and 40.'),
 });
 export type GenerateWordSearchPuzzleInput = z.infer<typeof GenerateWordSearchPuzzleInputSchema>;
 
@@ -54,9 +50,6 @@ export async function generateWordSearchPuzzle(input: GenerateWordSearchPuzzleIn
   return generateWordSearchPuzzleFlow(input);
 }
 
-// Define a minimal prompt for documentation purposes within Genkit.
-// The actual word search generation logic is handled by a local utility function,
-// adhering to the requirement for local puzzle generation without external AI for the algorithm itself.
 const prompt = ai.definePrompt({
   name: 'wordSearchPuzzleGenerationPrompt',
   input: { schema: GenerateWordSearchPuzzleInputSchema },
@@ -74,9 +67,6 @@ const prompt = ai.definePrompt({
 
 /**
  * The Genkit flow for generating a word search puzzle.
- * This flow orchestrates the puzzle generation by calling a local, deterministic algorithm.
- * It includes a prompt definition to satisfy Genkit's structure, though the LLM is not
- * used for the core algorithmic puzzle generation itself.
  */
 const generateWordSearchPuzzleFlow = ai.defineFlow(
   {
@@ -85,21 +75,13 @@ const generateWordSearchPuzzleFlow = ai.defineFlow(
     outputSchema: GenerateWordSearchPuzzleOutputSchema,
   },
   async (input) => {
-    // Call the defined prompt as required by Genkit's structure.
-    // In this specific scenario, the LLM's direct output for the grid is not used
-    // because the core word search generation algorithm is implemented locally for performance
-    // and to meet the 'no external APIs' constraint for this specific task.
-    // The prompt serves to register the task description with Genkit.
     await prompt(input);
 
-    // Execute the local word search generation algorithm.
-    // Words are converted to uppercase as is typical for word search puzzles.
     const { grid, wordPositions } = generateWordSearchPuzzleAlgorithm(
       input.words.map(w => w.toUpperCase()),
       input.gridSize
     );
 
-    // Return the result from the local, deterministic algorithm.
     return {
       grid,
       wordPositions,

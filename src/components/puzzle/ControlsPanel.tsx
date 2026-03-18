@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Settings2, Wand2 } from 'lucide-react';
 
@@ -17,16 +16,24 @@ interface ControlsPanelProps {
 export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGenerating }) => {
   const [title, setTitle] = useState('');
   const [wordsInput, setWordsInput] = useState('');
-  const [gridSize, setGridSize] = useState('12');
+  const [gridSize, setGridSize] = useState<number>(15);
 
   const handleGenerate = () => {
-    // Process words: split by newline or comma, trim, filter empty
     const words = wordsInput
       .split(/[\n,]/)
       .map(w => w.trim().toUpperCase())
       .filter(w => w.length > 0);
     
-    onGenerate(title, words, parseInt(gridSize));
+    onGenerate(title, words, gridSize);
+  };
+
+  const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      setGridSize(value);
+    } else if (e.target.value === '') {
+      setGridSize(0);
+    }
   };
 
   return (
@@ -60,18 +67,20 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="grid-size">Grid Size</Label>
-          <Select value={gridSize} onValueChange={setGridSize}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">Small (10x10)</SelectItem>
-              <SelectItem value="12">Standard (12x12)</SelectItem>
-              <SelectItem value="15">Large (15x15)</SelectItem>
-              <SelectItem value="20">Expert (20x20)</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="grid-size">Grid Size (8-40)</Label>
+          <div className="flex items-center gap-3">
+            <Input 
+              id="grid-size" 
+              type="number" 
+              min={8} 
+              max={40} 
+              value={gridSize || ''}
+              onChange={handleSizeChange}
+              className="w-full"
+            />
+            <span className="text-muted-foreground whitespace-nowrap">x {gridSize || '?'}</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground">Standard size is 15. Min: 8, Max: 40.</p>
         </div>
 
         <Button 

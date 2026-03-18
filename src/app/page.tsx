@@ -25,8 +25,15 @@ export default function Home() {
   const handleGenerate = useCallback((newTitle: string, words: string[], size: number) => {
     setError(null);
     
+    // Grid Size Validation
+    if (isNaN(size) || size < 8 || size > 40) {
+      setError("Please enter a grid size between 8 and 40.");
+      return;
+    }
+
+    // Empty Word List Validation
     if (words.length === 0) {
-      setError("Please enter at least one word.");
+      setError("Please enter at least one word to include in the puzzle.");
       return;
     }
 
@@ -34,10 +41,11 @@ export default function Home() {
     if (uniqueWords.length !== words.length) {
       toast({
         title: "Duplicates Removed",
-        description: "We removed duplicate words from your list.",
+        description: "We automatically removed duplicate words from your list.",
       });
     }
 
+    // Word Length Validation
     const tooLongWords = uniqueWords.filter(w => w.length > size);
     if (tooLongWords.length > 0) {
       setError(`The following words are too long for a ${size}x${size} grid: ${tooLongWords.join(', ')}`);
@@ -45,7 +53,7 @@ export default function Home() {
     }
 
     setIsGenerating(true);
-    // Simulate generation delay for UI feel
+    // Simulate generation delay for UX feel
     setTimeout(() => {
       try {
         const data = generateWordSearchPuzzleAlgorithm(uniqueWords, size);
@@ -53,7 +61,7 @@ export default function Home() {
         setTitle(newTitle || 'Word Search');
         setShowSolution(false);
       } catch (err: any) {
-        setError(err.message || "Failed to generate puzzle. Try reducing the number of words.");
+        setError(err.message || "Failed to generate puzzle. Try reducing the number of words or increasing the grid size.");
       } finally {
         setIsGenerating(false);
       }
@@ -86,41 +94,41 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-8">
               <ControlsPanel onGenerate={handleGenerate} isGenerating={isGenerating} />
               
-              <div className="flex flex-col items-center justify-center min-h-[400px]">
+              <div className="flex flex-col items-center justify-start min-h-[400px]">
                 {error && (
-                  <Alert variant="destructive" className="mb-6 max-w-md">
+                  <Alert variant="destructive" className="mb-6 w-full max-w-2xl">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
+                    <AlertTitle>Validation Error</AlertTitle>
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
 
                 {!puzzle && !isGenerating && !error && (
-                  <div className="text-center space-y-4 max-w-md">
+                  <div className="text-center space-y-4 max-w-md mt-12">
                     <div className="bg-white p-8 rounded-2xl shadow-sm border">
                       <LayoutGrid className="w-16 h-16 text-muted/30 mx-auto mb-4" />
                       <h2 className="text-2xl font-bold text-foreground mb-2">Ready to Forge?</h2>
                       <p className="text-muted-foreground">
-                        Enter your words on the left and click Generate to create your custom Word Search puzzle.
+                        Enter your words and set your desired grid size (8-40) to create your custom Word Search puzzle.
                       </p>
                     </div>
                   </div>
                 )}
 
                 {isGenerating && (
-                  <div className="text-center">
+                  <div className="text-center mt-20">
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
                     <p className="text-primary font-medium">Forging your puzzle...</p>
                   </div>
                 )}
 
                 {puzzle && !isGenerating && (
-                  <div className="w-full bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-blue-100">
+                  <div className="w-full bg-white p-4 sm:p-10 rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
                     <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                      <h2 className="text-3xl font-bold text-primary font-headline text-center sm:text-left">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-primary font-headline text-center sm:text-left break-all">
                         {title}
                       </h2>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 shrink-0">
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -133,11 +141,13 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <PuzzleGrid 
-                      grid={puzzle.grid} 
-                      showSolution={showSolution} 
-                      wordPositions={puzzle.wordPositions} 
-                    />
+                    <div className="overflow-x-auto pb-4 flex justify-center">
+                      <PuzzleGrid 
+                        grid={puzzle.grid} 
+                        showSolution={showSolution} 
+                        wordPositions={puzzle.wordPositions} 
+                      />
+                    </div>
 
                     <WordList words={puzzle.wordPositions.map(p => p.word)} />
 

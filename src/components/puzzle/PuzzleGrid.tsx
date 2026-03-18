@@ -13,7 +13,7 @@ interface PuzzleGridProps {
 export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, wordPositions }) => {
   const size = grid.length;
 
-  // Create a map of row-col to identify highlighted cells for simple UI feedback
+  // Create a map of row-col to identify highlighted cells
   const highlightedCells = new Set<string>();
   if (showSolution) {
     wordPositions.forEach((pos) => {
@@ -28,6 +28,14 @@ export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, word
       }
     });
   }
+
+  // Calculate dynamic cell size for large grids to maintain visibility
+  // If size is very large, we scale down the minimum size
+  const getCellSizeClass = () => {
+    if (size > 30) return "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[8px] sm:text-xs";
+    if (size > 20) return "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-xs sm:text-base";
+    return "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-sm sm:text-lg md:text-xl";
+  };
 
   return (
     <div 
@@ -44,8 +52,8 @@ export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, word
             <div
               key={`${rIdx}-${cIdx}`}
               className={cn(
-                "puzzle-grid-cell bg-white text-sm sm:text-lg md:text-xl",
-                "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12",
+                "puzzle-grid-cell bg-white",
+                getCellSizeClass(),
                 isHighlighted && "highlighted-cell"
               )}
             >
