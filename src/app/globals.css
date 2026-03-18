@@ -44,20 +44,23 @@
   font-weight: 700;
   text-transform: uppercase;
   transition: all 0.2s ease;
+  user-select: none;
 }
 
 .highlighted-cell {
-  background-color: hsl(var(--secondary) / 0.3);
-  color: hsl(var(--primary));
+  background-color: hsl(var(--secondary) / 0.5) !important;
+  color: hsl(var(--foreground)) !important;
   position: relative;
+  z-index: 1;
 }
 
 .highlighted-cell::after {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: -1px;
   border: 2px solid hsl(var(--secondary));
-  border-radius: 4px;
+  border-radius: 2px;
+  pointer-events: none;
 }
 
 /* Ad placeholder styling */

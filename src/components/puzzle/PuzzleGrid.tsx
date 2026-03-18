@@ -29,17 +29,18 @@ export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, word
     });
   }
 
-  // Calculate dynamic cell size for large grids to maintain visibility
-  // If size is very large, we scale down the minimum size
+  // Improved sizing logic for better readability
   const getCellSizeClass = () => {
-    if (size > 30) return "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[8px] sm:text-xs";
-    if (size > 20) return "w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-xs sm:text-base";
-    return "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-sm sm:text-lg md:text-xl";
+    if (size <= 10) return "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-xl sm:text-2xl md:text-3xl";
+    if (size <= 15) return "w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 text-lg sm:text-xl md:text-2xl";
+    if (size <= 20) return "w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-base sm:text-lg md:text-xl";
+    if (size <= 30) return "w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-xs sm:text-sm md:text-base";
+    return "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[10px] sm:text-xs md:text-sm";
   };
 
   return (
     <div 
-      className="grid gap-px bg-border border border-border rounded-lg overflow-hidden shadow-sm mx-auto w-fit"
+      className="grid gap-[2px] bg-slate-300 p-[2px] rounded-lg shadow-inner mx-auto w-fit overflow-hidden"
       style={{ 
         gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
         maxWidth: '100%' 
@@ -52,7 +53,7 @@ export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, word
             <div
               key={`${rIdx}-${cIdx}`}
               className={cn(
-                "puzzle-grid-cell bg-white",
+                "puzzle-grid-cell bg-white font-mono leading-none",
                 getCellSizeClass(),
                 isHighlighted && "highlighted-cell"
               )}
