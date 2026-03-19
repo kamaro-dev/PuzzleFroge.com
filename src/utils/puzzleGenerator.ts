@@ -15,44 +15,50 @@ export type PuzzleData = {
 };
 
 export type DirectionOptions = {
-  horizontal: boolean;
-  vertical: boolean;
-  diagonal: boolean;
-  backwards: boolean;
+  right: boolean;      // →
+  left: boolean;       // ←
+  down: boolean;       // ↓
+  up: boolean;         // ↑
+  downRight: boolean;  // ↘
+  downLeft: boolean;   // ↙
+  upRight: boolean;    // ↗
+  upLeft: boolean;     // ↖
 };
 
-const DIRECTIONS = [
-  { name: 'horizontal-forward', dr: 0, dc: 1, type: 'horizontal', isBackward: false },
-  { name: 'horizontal-backward', dr: 0, dc: -1, type: 'horizontal', isBackward: true },
-  { name: 'vertical-forward', dr: 1, dc: 0, type: 'vertical', isBackward: false },
-  { name: 'vertical-backward', dr: -1, dc: 0, type: 'vertical', isBackward: true },
-  { name: 'diagonal-down-right-forward', dr: 1, dc: 1, type: 'diagonal', isBackward: false },
-  { name: 'diagonal-down-right-backward', dr: -1, dc: -1, type: 'diagonal', isBackward: true },
-  { name: 'diagonal-up-right-forward', dr: -1, dc: 1, type: 'diagonal', isBackward: false },
-  { name: 'diagonal-up-right-backward', dr: 1, dc: -1, type: 'diagonal', isBackward: true },
+const DIRECTIONS_MAP = [
+  { name: 'right', dr: 0, dc: 1, key: 'right' as keyof DirectionOptions },
+  { name: 'left', dr: 0, dc: -1, key: 'left' as keyof DirectionOptions },
+  { name: 'down', dr: 1, dc: 0, key: 'down' as keyof DirectionOptions },
+  { name: 'up', dr: -1, dc: 0, key: 'up' as keyof DirectionOptions },
+  { name: 'downRight', dr: 1, dc: 1, key: 'downRight' as keyof DirectionOptions },
+  { name: 'downLeft', dr: 1, dc: -1, key: 'downLeft' as keyof DirectionOptions },
+  { name: 'upRight', dr: -1, dc: 1, key: 'upRight' as keyof DirectionOptions },
+  { name: 'upLeft', dr: -1, dc: -1, key: 'upLeft' as keyof DirectionOptions },
 ];
+
+const DEFAULT_DIRECTIONS: DirectionOptions = {
+  right: true,
+  left: true,
+  down: true,
+  up: true,
+  downRight: true,
+  downLeft: true,
+  upRight: true,
+  upLeft: true,
+};
 
 export function generateWordSearchPuzzleAlgorithm(
   words: string[], 
   width: number,
   height: number,
-  options: DirectionOptions = { horizontal: true, vertical: true, diagonal: true, backwards: true }
+  options: DirectionOptions = DEFAULT_DIRECTIONS
 ): PuzzleData {
   const grid: string[][] = Array.from({ length: height }, () => Array(width).fill(''));
   const wordPositions: WordPosition[] = [];
   const sortedWords = [...words].sort((a, b) => b.length - a.length);
 
-  // Filter allowed directions based on options
-  const allowedDirections = DIRECTIONS.filter(dir => {
-    const typeMatch = (dir.type === 'horizontal' && options.horizontal) ||
-                      (dir.type === 'vertical' && options.vertical) ||
-                      (dir.type === 'diagonal' && options.diagonal);
-    
-    if (!typeMatch) return false;
-    if (dir.isBackward && !options.backwards) return false;
-    
-    return true;
-  });
+  // Filter allowed directions based on explicit options
+  const allowedDirections = DIRECTIONS_MAP.filter(dir => options[dir.key]);
 
   if (allowedDirections.length === 0) {
     throw new Error("Please select at least one direction.");
@@ -61,7 +67,7 @@ export function generateWordSearchPuzzleAlgorithm(
   for (const word of sortedWords) {
     let placed = false;
     let attempts = 0;
-    const maxAttempts = 1000;
+    const maxAttempts = 2000; // Increased attempts for complex directional constraints
 
     while (!placed && attempts < maxAttempts) {
       attempts++;

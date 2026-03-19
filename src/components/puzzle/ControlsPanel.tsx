@@ -12,9 +12,13 @@ import {
   Wand2, 
   ArrowRightLeft, 
   ArrowRight, 
+  ArrowLeft,
   ArrowDown, 
-  ArrowUpRight, 
-  ArrowLeft 
+  ArrowUp,
+  ArrowDownRight,
+  ArrowDownLeft,
+  ArrowUpRight,
+  ArrowUpLeft
 } from 'lucide-react';
 import { DirectionOptions } from '@/utils/puzzleGenerator';
 
@@ -29,12 +33,16 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
   const [gridWidth, setGridWidth] = useState<number>(15);
   const [gridHeight, setGridHeight] = useState<number>(15);
   
-  // Direction Settings
+  // Explicit 8 Directions Settings
   const [directions, setDirections] = useState<DirectionOptions>({
-    horizontal: true,
-    vertical: true,
-    diagonal: true,
-    backwards: true,
+    right: true,
+    left: true,
+    down: true,
+    up: true,
+    downRight: true,
+    downLeft: true,
+    upRight: true,
+    upLeft: true,
   });
 
   const handleGenerate = () => {
@@ -70,6 +78,17 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
       [key]: !prev[key]
     }));
   };
+
+  const directionConfigs = [
+    { key: 'right' as const, label: 'Forward', icon: ArrowRight },
+    { key: 'left' as const, label: 'Backward', icon: ArrowLeft },
+    { key: 'down' as const, label: 'Down', icon: ArrowDown },
+    { key: 'up' as const, label: 'Up', icon: ArrowUp },
+    { key: 'downRight' as const, label: 'Diag Down-R', icon: ArrowDownRight },
+    { key: 'downLeft' as const, label: 'Diag Down-L', icon: ArrowDownLeft },
+    { key: 'upRight' as const, label: 'Diag Up-R', icon: ArrowUpRight },
+    { key: 'upLeft' as const, label: 'Diag Up-L', icon: ArrowUpLeft },
+  ];
 
   return (
     <Card className="h-fit shadow-md border-slate-200">
@@ -107,51 +126,23 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
             <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
             Word Directions
           </Label>
-          <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="horizontal" 
-                checked={directions.horizontal} 
-                onCheckedChange={() => toggleDirection('horizontal')} 
-              />
-              <label htmlFor="horizontal" className="text-sm font-medium leading-none cursor-pointer flex items-center gap-1.5">
-                <ArrowRight className="w-3.5 h-3.5 text-primary/60" />
-                Horizontal
-              </label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="vertical" 
-                checked={directions.vertical} 
-                onCheckedChange={() => toggleDirection('vertical')} 
-              />
-              <label htmlFor="vertical" className="text-sm font-medium leading-none cursor-pointer flex items-center gap-1.5">
-                <ArrowDown className="w-3.5 h-3.5 text-primary/60" />
-                Vertical
-              </label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="diagonal" 
-                checked={directions.diagonal} 
-                onCheckedChange={() => toggleDirection('diagonal')} 
-              />
-              <label htmlFor="diagonal" className="text-sm font-medium leading-none cursor-pointer flex items-center gap-1.5">
-                <ArrowUpRight className="w-3.5 h-3.5 text-primary/60" />
-                Diagonal
-              </label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="backwards" 
-                checked={directions.backwards} 
-                onCheckedChange={() => toggleDirection('backwards')} 
-              />
-              <label htmlFor="backwards" className="text-sm font-medium leading-none cursor-pointer flex items-center gap-1.5">
-                <ArrowLeft className="w-3.5 h-3.5 text-primary/60" />
-                Backwards
-              </label>
-            </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            {directionConfigs.map((dir) => (
+              <div key={dir.key} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={dir.key} 
+                  checked={directions[dir.key]} 
+                  onCheckedChange={() => toggleDirection(dir.key)} 
+                />
+                <label 
+                  htmlFor={dir.key} 
+                  className="text-[13px] font-medium leading-none cursor-pointer flex items-center gap-1.5"
+                >
+                  <dir.icon className="w-3.5 h-3.5 text-primary/60 shrink-0" />
+                  <span className="truncate">{dir.label}</span>
+                </label>
+              </div>
+            ))}
           </div>
         </div>
 

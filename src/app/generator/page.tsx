@@ -32,8 +32,9 @@ export default function GeneratorPage() {
     }
 
     // Direction Selection Validation
-    if (!options.horizontal && !options.vertical && !options.diagonal) {
-      setError("Please select at least one primary direction (Horizontal, Vertical, or Diagonal).");
+    const anyDirectionSelected = Object.values(options).some(val => val === true);
+    if (!anyDirectionSelected) {
+      setError("Please select at least one word direction.");
       return;
     }
 
