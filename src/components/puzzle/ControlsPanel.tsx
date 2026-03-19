@@ -80,14 +80,14 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
   };
 
   const directionConfigs = [
-    { key: 'right' as const, label: 'Forward', icon: ArrowRight },
-    { key: 'left' as const, label: 'Backward', icon: ArrowLeft },
-    { key: 'down' as const, label: 'Down', icon: ArrowDown },
-    { key: 'up' as const, label: 'Up', icon: ArrowUp },
-    { key: 'downRight' as const, label: 'Diag Down-R', icon: ArrowDownRight },
-    { key: 'downLeft' as const, label: 'Diag Down-L', icon: ArrowDownLeft },
-    { key: 'upRight' as const, label: 'Diag Up-R', icon: ArrowUpRight },
-    { key: 'upLeft' as const, label: 'Diag Up-L', icon: ArrowUpLeft },
+    { key: 'right' as const, label: 'Left to right', icon: ArrowRight },
+    { key: 'left' as const, label: 'Right to left', icon: ArrowLeft },
+    { key: 'down' as const, label: 'Top to bottom', icon: ArrowDown },
+    { key: 'up' as const, label: 'Bottom to top', icon: ArrowUp },
+    { key: 'downRight' as const, label: 'Top-left to bottom-right', icon: ArrowDownRight },
+    { key: 'downLeft' as const, label: 'Top-right to bottom-left', icon: ArrowDownLeft },
+    { key: 'upRight' as const, label: 'Bottom-left to top-right', icon: ArrowUpRight },
+    { key: 'upLeft' as const, label: 'Bottom-right to top-left', icon: ArrowUpLeft },
   ];
 
   return (
@@ -124,11 +124,11 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
         <div className="space-y-4 pt-2">
           <Label className="flex items-center gap-2 text-foreground/80">
             <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
-            Word Directions
+            Word Placement
           </Label>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <div className="flex flex-col gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
             {directionConfigs.map((dir) => (
-              <div key={dir.key} className="flex items-center space-x-2">
+              <div key={dir.key} className="flex items-center space-x-3">
                 <Checkbox 
                   id={dir.key} 
                   checked={directions[dir.key]} 
@@ -136,10 +136,10 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
                 />
                 <label 
                   htmlFor={dir.key} 
-                  className="text-[13px] font-medium leading-none cursor-pointer flex items-center gap-1.5"
+                  className="text-sm font-medium leading-none cursor-pointer flex items-center gap-2.5"
                 >
-                  <dir.icon className="w-3.5 h-3.5 text-primary/60 shrink-0" />
-                  <span className="truncate">{dir.label}</span>
+                  <dir.icon className="w-4 h-4 text-primary shrink-0" />
+                  <span className="text-foreground/90">{dir.label}</span>
                 </label>
               </div>
             ))}
