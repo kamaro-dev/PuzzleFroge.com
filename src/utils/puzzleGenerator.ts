@@ -13,30 +13,57 @@ export type PuzzleData = {
   size: number;
 };
 
+export type DirectionOptions = {
+  horizontal: boolean;
+  vertical: boolean;
+  diagonal: boolean;
+  backwards: boolean;
+};
+
 const DIRECTIONS = [
-  { name: 'horizontal-forward', dr: 0, dc: 1 },
-  { name: 'horizontal-backward', dr: 0, dc: -1 },
-  { name: 'vertical-forward', dr: 1, dc: 0 },
-  { name: 'vertical-backward', dr: -1, dc: 0 },
-  { name: 'diagonal-down-right-forward', dr: 1, dc: 1 },
-  { name: 'diagonal-down-right-backward', dr: -1, dc: -1 },
-  { name: 'diagonal-up-right-forward', dr: -1, dc: 1 },
-  { name: 'diagonal-up-right-backward', dr: 1, dc: -1 },
+  { name: 'horizontal-forward', dr: 0, dc: 1, type: 'horizontal', isBackward: false },
+  { name: 'horizontal-backward', dr: 0, dc: -1, type: 'horizontal', isBackward: true },
+  { name: 'vertical-forward', dr: 1, dc: 0, type: 'vertical', isBackward: false },
+  { name: 'vertical-backward', dr: -1, dc: 0, type: 'vertical', isBackward: true },
+  { name: 'diagonal-down-right-forward', dr: 1, dc: 1, type: 'diagonal', isBackward: false },
+  { name: 'diagonal-down-right-backward', dr: -1, dc: -1, type: 'diagonal', isBackward: true },
+  { name: 'diagonal-up-right-forward', dr: -1, dc: 1, type: 'diagonal', isBackward: false },
+  { name: 'diagonal-up-right-backward', dr: 1, dc: -1, type: 'diagonal', isBackward: true },
 ];
 
-export function generateWordSearchPuzzleAlgorithm(words: string[], size: number): PuzzleData {
+export function generateWordSearchPuzzleAlgorithm(
+  words: string[], 
+  size: number, 
+  options: DirectionOptions = { horizontal: true, vertical: true, diagonal: true, backwards: true }
+): PuzzleData {
   const grid: string[][] = Array.from({ length: size }, () => Array(size).fill(''));
   const wordPositions: WordPosition[] = [];
   const sortedWords = [...words].sort((a, b) => b.length - a.length);
 
+  // Filter allowed directions based on options
+  const allowedDirections = DIRECTIONS.filter(dir => {
+    const typeMatch = (dir.type === 'horizontal' && options.horizontal) ||
+                      (dir.type === 'vertical' && options.vertical) ||
+                      (dir.type === 'diagonal' && options.diagonal);
+    
+    if (!typeMatch) return false;
+    if (dir.isBackward && !options.backwards) return false;
+    
+    return true;
+  });
+
+  if (allowedDirections.length === 0) {
+    throw new Error("Please select at least one direction.");
+  }
+
   for (const word of sortedWords) {
     let placed = false;
     let attempts = 0;
-    const maxAttempts = 200;
+    const maxAttempts = 500; // Increased attempts for restrictive direction settings
 
     while (!placed && attempts < maxAttempts) {
       attempts++;
-      const dir = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+      const dir = allowedDirections[Math.floor(Math.random() * allowedDirections.length)];
       const startRow = Math.floor(Math.random() * size);
       const startCol = Math.floor(Math.random() * size);
 
@@ -74,7 +101,7 @@ export function generateWordSearchPuzzleAlgorithm(words: string[], size: number)
     }
     
     if (!placed) {
-      throw new Error(`Could not place word: ${word}. Try a larger grid or fewer/shorter words.`);
+      throw new Error(`Could not place word: ${word}. Try a larger grid or enabling more directions.`);
     }
   }
 

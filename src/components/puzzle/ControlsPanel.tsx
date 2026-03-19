@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Settings2, Wand2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Settings2, Wand2, ArrowRightLeft } from 'lucide-react';
+import { DirectionOptions } from '@/utils/puzzleGenerator';
 
 interface ControlsPanelProps {
-  onGenerate: (title: string, words: string[], size: number) => void;
+  onGenerate: (title: string, words: string[], size: number, options: DirectionOptions) => void;
   isGenerating: boolean;
 }
 
@@ -17,6 +19,14 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
   const [title, setTitle] = useState('');
   const [wordsInput, setWordsInput] = useState('');
   const [gridSize, setGridSize] = useState<number>(15);
+  
+  // Direction Settings
+  const [directions, setDirections] = useState<DirectionOptions>({
+    horizontal: true,
+    vertical: true,
+    diagonal: true,
+    backwards: true,
+  });
 
   const handleGenerate = () => {
     const words = wordsInput
@@ -24,7 +34,7 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
       .map(w => w.trim().toUpperCase())
       .filter(w => w.length > 0);
     
-    onGenerate(title, words, gridSize);
+    onGenerate(title, words, gridSize, directions);
   };
 
   const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +44,13 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
     } else if (e.target.value === '') {
       setGridSize(0);
     }
+  };
+
+  const toggleDirection = (key: keyof DirectionOptions) => {
+    setDirections(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
 
   return (
@@ -64,6 +81,55 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
             value={wordsInput}
             onChange={(e) => setWordsInput(e.target.value)}
           />
+        </div>
+
+        <div className="space-y-4 pt-2">
+          <Label className="flex items-center gap-2">
+            <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
+            Word Directions
+          </Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="horizontal" 
+                checked={directions.horizontal} 
+                onCheckedChange={() => toggleDirection('horizontal')} 
+              />
+              <label htmlFor="horizontal" className="text-sm font-medium leading-none cursor-pointer">
+                Horizontal
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="vertical" 
+                checked={directions.vertical} 
+                onCheckedChange={() => toggleDirection('vertical')} 
+              />
+              <label htmlFor="vertical" className="text-sm font-medium leading-none cursor-pointer">
+                Vertical
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="diagonal" 
+                checked={directions.diagonal} 
+                onCheckedChange={() => toggleDirection('diagonal')} 
+              />
+              <label htmlFor="diagonal" className="text-sm font-medium leading-none cursor-pointer">
+                Diagonal
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="backwards" 
+                checked={directions.backwards} 
+                onCheckedChange={() => toggleDirection('backwards')} 
+              />
+              <label htmlFor="backwards" className="text-sm font-medium leading-none cursor-pointer">
+                Backwards
+              </label>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">

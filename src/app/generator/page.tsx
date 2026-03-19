@@ -7,7 +7,7 @@ import { ControlsPanel } from '@/components/puzzle/ControlsPanel';
 import { PuzzleGrid } from '@/components/puzzle/PuzzleGrid';
 import { WordList } from '@/components/puzzle/WordList';
 import { AdBanner } from '@/components/layout/AdBanner';
-import { generateWordSearchPuzzleAlgorithm, PuzzleData } from '@/utils/puzzleGenerator';
+import { generateWordSearchPuzzleAlgorithm, PuzzleData, DirectionOptions } from '@/utils/puzzleGenerator';
 import { exportToPNG } from '@/utils/exportImage';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -22,12 +22,18 @@ export default function GeneratorPage() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleGenerate = useCallback((newTitle: string, words: string[], size: number) => {
+  const handleGenerate = useCallback((newTitle: string, words: string[], size: number, options: DirectionOptions) => {
     setError(null);
     
     // Grid Size Validation
     if (isNaN(size) || size < 8 || size > 40) {
       setError("Please enter a grid size between 8 and 40.");
+      return;
+    }
+
+    // Direction Selection Validation
+    if (!options.horizontal && !options.vertical && !options.diagonal) {
+      setError("Please select at least one primary direction (Horizontal, Vertical, or Diagonal).");
       return;
     }
 
@@ -56,7 +62,7 @@ export default function GeneratorPage() {
     // Simulate generation delay for UX feel
     setTimeout(() => {
       try {
-        const data = generateWordSearchPuzzleAlgorithm(uniqueWords, size);
+        const data = generateWordSearchPuzzleAlgorithm(uniqueWords, size, options);
         setPuzzle(data);
         setTitle(newTitle || 'Word Search');
         setShowSolution(false);
@@ -109,7 +115,7 @@ export default function GeneratorPage() {
                       <LayoutGrid className="w-16 h-16 text-muted/30 mx-auto mb-4" />
                       <h2 className="text-2xl font-bold text-foreground mb-2">Ready to Forge?</h2>
                       <p className="text-muted-foreground">
-                        Enter your words and set your desired grid size (8-40) to create your custom Word Search puzzle.
+                        Enter your words, choose directions, and set your grid size to create your custom Word Search puzzle.
                       </p>
                     </div>
                   </div>
