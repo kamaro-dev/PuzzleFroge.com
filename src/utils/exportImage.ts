@@ -15,37 +15,42 @@ export async function exportToPNG(options: ExportOptions, filename: string) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  const cellSize = 40;
-  const padding = 60;
-  const titleHeight = 80;
-  const footerHeight = Math.ceil(words.length / 3) * 30 + 40;
+  // Layout Constants for a "Printable Worksheet" look
+  const cellSize = 35; 
+  const pagePadding = 100; // Large margins for printing
+  const titleAreaHeight = 150;
+  const wordListHeaderHeight = 60;
+  const wordsPerRow = 4;
+  const wordRowHeight = 35;
+  const wordListHeight = Math.ceil(words.length / wordsPerRow) * wordRowHeight + wordListHeaderHeight + 40;
   
   const gridWidth = size * cellSize;
   const gridHeight = size * cellSize;
   
-  canvas.width = gridWidth + padding * 2;
-  canvas.height = gridHeight + titleHeight + footerHeight + padding;
+  // Set Canvas Dimensions
+  canvas.width = gridWidth + pagePadding * 2;
+  canvas.height = titleAreaHeight + gridHeight + wordListHeight + pagePadding;
 
-  // Background
+  // 1. Background (Pure White)
   ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Title
-  ctx.fillStyle = '#347DB2';
-  ctx.font = 'bold 32px Inter, sans-serif';
+  // 2. Draw Title
+  ctx.fillStyle = '#000000';
+  ctx.font = 'bold 48px "Inter", "Helvetica", "Arial", sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText(title || 'Word Search', canvas.width / 2, padding + 20);
+  ctx.textBaseline = 'middle';
+  ctx.fillText((title || 'WORD SEARCH').toUpperCase(), canvas.width / 2, pagePadding + 50);
 
-  // Grid background
-  const gridX = padding;
-  const gridY = padding + titleHeight;
+  const gridX = pagePadding;
+  const gridY = pagePadding + titleAreaHeight;
   
-  // Highlighting solution
+  // 3. Draw Solution Highlights (Under the letters)
   if (showSolution) {
-    ctx.strokeStyle = '#56CEE4';
-    ctx.lineWidth = 24;
+    ctx.strokeStyle = '#E2E8F0'; // Light grey highlight for clean printing
+    ctx.lineWidth = cellSize * 0.75;
     ctx.lineCap = 'round';
-    ctx.globalAlpha = 0.4;
+    ctx.globalAlpha = 0.8;
     
     wordPositions.forEach(pos => {
       const sx = gridX + pos.startCol * cellSize + cellSize / 2;
@@ -61,24 +66,15 @@ export async function exportToPNG(options: ExportOptions, filename: string) {
     ctx.globalAlpha = 1.0;
   }
 
-  // Draw Grid Letters
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 20px Inter, monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  // 4. Draw Grid Outline & Grid Lines
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(gridX, gridY, gridWidth, gridHeight);
 
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      const x = gridX + c * cellSize + cellSize / 2;
-      const y = gridY + r * cellSize + cellSize / 2;
-      ctx.fillText(grid[r][c], x, y);
-    }
-  }
-
-  // Draw Grid Lines (optional for cleaner look)
-  ctx.strokeStyle = '#E2E8F0';
+  // Subtle inner grid lines
+  ctx.strokeStyle = '#F1F5F9';
   ctx.lineWidth = 1;
-  for (let i = 0; i <= size; i++) {
+  for (let i = 1; i < size; i++) {
     const pos = i * cellSize;
     // vertical
     ctx.beginPath();
@@ -92,20 +88,52 @@ export async function exportToPNG(options: ExportOptions, filename: string) {
     ctx.stroke();
   }
 
-  // Word List
-  ctx.fillStyle = '#334155';
-  ctx.font = '16px Inter, sans-serif';
-  ctx.textAlign = 'left';
-  const listY = gridY + gridHeight + 40;
-  const colWidth = gridWidth / 3;
+  // 5. Draw Grid Letters
+  ctx.fillStyle = '#000000';
+  ctx.font = `bold ${Math.floor(cellSize * 0.6)}px "Courier New", Courier, monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
 
-  words.forEach((word, i) => {
-    const col = i % 3;
-    const row = Math.floor(i / 3);
-    ctx.fillText(word.toUpperCase(), gridX + col * colWidth, listY + row * 25);
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      const x = gridX + c * cellSize + cellSize / 2;
+      const y = gridY + r * cellSize + cellSize / 2;
+      ctx.fillText(grid[r][c], x, y);
+    }
+  }
+
+  // 6. Draw Word List Section
+  const listStartY = gridY + gridHeight + 60;
+  
+  // Header: WORDS TO FIND
+  ctx.fillStyle = '#000000';
+  ctx.font = 'bold 24px "Inter", "Helvetica", "Arial", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('WORDS TO FIND', canvas.width / 2, listStartY);
+
+  // Word Grid
+  ctx.font = '18px "Inter", "Helvetica", "Arial", sans-serif';
+  ctx.textAlign = 'left';
+  const columnWidth = gridWidth / wordsPerRow;
+  const wordContentY = listStartY + 45;
+
+  const sortedWords = [...words].sort();
+  sortedWords.forEach((word, i) => {
+    const col = i % wordsPerRow;
+    const row = Math.floor(i / wordsPerRow);
+    const x = gridX + (col * columnWidth);
+    const y = wordContentY + (row * wordRowHeight);
+    
+    // Draw bullet point
+    ctx.fillStyle = '#64748B'; // Muted bullet color
+    ctx.fillText('•', x, y);
+    
+    // Draw word
+    ctx.fillStyle = '#000000';
+    ctx.fillText(word.toUpperCase(), x + 15, y);
   });
 
-  // Export
+  // Final Export
   const dataUrl = canvas.toDataURL('image/png');
   const link = document.createElement('a');
   link.download = `${filename}.png`;
