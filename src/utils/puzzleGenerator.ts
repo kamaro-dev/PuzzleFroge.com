@@ -10,7 +10,8 @@ export type WordPosition = {
 export type PuzzleData = {
   grid: string[][];
   wordPositions: WordPosition[];
-  size: number;
+  width: number;
+  height: number;
 };
 
 export type DirectionOptions = {
@@ -33,10 +34,11 @@ const DIRECTIONS = [
 
 export function generateWordSearchPuzzleAlgorithm(
   words: string[], 
-  size: number, 
+  width: number,
+  height: number,
   options: DirectionOptions = { horizontal: true, vertical: true, diagonal: true, backwards: true }
 ): PuzzleData {
-  const grid: string[][] = Array.from({ length: size }, () => Array(size).fill(''));
+  const grid: string[][] = Array.from({ length: height }, () => Array(width).fill(''));
   const wordPositions: WordPosition[] = [];
   const sortedWords = [...words].sort((a, b) => b.length - a.length);
 
@@ -59,18 +61,18 @@ export function generateWordSearchPuzzleAlgorithm(
   for (const word of sortedWords) {
     let placed = false;
     let attempts = 0;
-    const maxAttempts = 500; // Increased attempts for restrictive direction settings
+    const maxAttempts = 1000;
 
     while (!placed && attempts < maxAttempts) {
       attempts++;
       const dir = allowedDirections[Math.floor(Math.random() * allowedDirections.length)];
-      const startRow = Math.floor(Math.random() * size);
-      const startCol = Math.floor(Math.random() * size);
+      const startRow = Math.floor(Math.random() * height);
+      const startCol = Math.floor(Math.random() * width);
 
       const endRow = startRow + dir.dr * (word.length - 1);
       const endCol = startCol + dir.dc * (word.length - 1);
 
-      if (endRow >= 0 && endRow < size && endCol >= 0 && endCol < size) {
+      if (endRow >= 0 && endRow < height && endCol >= 0 && endCol < width) {
         let canPlace = true;
         for (let i = 0; i < word.length; i++) {
           const r = startRow + dir.dr * i;
@@ -107,13 +109,13 @@ export function generateWordSearchPuzzleAlgorithm(
 
   // Fill remaining cells
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
+  for (let r = 0; r < height; r++) {
+    for (let c = 0; c < width; c++) {
       if (grid[r][c] === '') {
         grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
       }
     }
   }
 
-  return { grid, wordPositions, size };
+  return { grid, wordPositions, width, height };
 }

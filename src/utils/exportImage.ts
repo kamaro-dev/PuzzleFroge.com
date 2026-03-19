@@ -6,11 +6,12 @@ type ExportOptions = {
   words: string[];
   wordPositions: WordPosition[];
   showSolution: boolean;
-  size: number;
+  width: number;
+  height: number;
 };
 
 export async function exportToPNG(options: ExportOptions, filename: string) {
-  const { title, grid, words, wordPositions, showSolution, size } = options;
+  const { title, grid, words, wordPositions, showSolution, width, height } = options;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -24,8 +25,8 @@ export async function exportToPNG(options: ExportOptions, filename: string) {
   const wordRowHeight = 35;
   const wordListHeight = Math.ceil(words.length / wordsPerRow) * wordRowHeight + wordListHeaderHeight + 40;
   
-  const gridWidth = size * cellSize;
-  const gridHeight = size * cellSize;
+  const gridWidth = width * cellSize;
+  const gridHeight = height * cellSize;
   
   // Set Canvas Dimensions
   canvas.width = gridWidth + pagePadding * 2;
@@ -74,14 +75,15 @@ export async function exportToPNG(options: ExportOptions, filename: string) {
   // Subtle inner grid lines
   ctx.strokeStyle = '#F1F5F9';
   ctx.lineWidth = 1;
-  for (let i = 1; i < size; i++) {
+  for (let i = 1; i < width; i++) {
     const pos = i * cellSize;
-    // vertical
     ctx.beginPath();
     ctx.moveTo(gridX + pos, gridY);
     ctx.lineTo(gridX + pos, gridY + gridHeight);
     ctx.stroke();
-    // horizontal
+  }
+  for (let i = 1; i < height; i++) {
+    const pos = i * cellSize;
     ctx.beginPath();
     ctx.moveTo(gridX, gridY + pos);
     ctx.lineTo(gridX + gridWidth, gridY + pos);
@@ -94,8 +96,8 @@ export async function exportToPNG(options: ExportOptions, filename: string) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
+  for (let r = 0; r < height; r++) {
+    for (let c = 0; c < width; c++) {
       const x = gridX + c * cellSize + cellSize / 2;
       const y = gridY + r * cellSize + cellSize / 2;
       ctx.fillText(grid[r][c], x, y);

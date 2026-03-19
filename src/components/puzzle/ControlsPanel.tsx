@@ -19,14 +19,15 @@ import {
 import { DirectionOptions } from '@/utils/puzzleGenerator';
 
 interface ControlsPanelProps {
-  onGenerate: (title: string, words: string[], size: number, options: DirectionOptions) => void;
+  onGenerate: (title: string, words: string[], width: number, height: number, options: DirectionOptions) => void;
   isGenerating: boolean;
 }
 
 export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGenerating }) => {
   const [title, setTitle] = useState('');
   const [wordsInput, setWordsInput] = useState('');
-  const [gridSize, setGridSize] = useState<number>(15);
+  const [gridWidth, setGridWidth] = useState<number>(15);
+  const [gridHeight, setGridHeight] = useState<number>(15);
   
   // Direction Settings
   const [directions, setDirections] = useState<DirectionOptions>({
@@ -42,15 +43,24 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
       .map(w => w.trim().toUpperCase())
       .filter(w => w.length > 0);
     
-    onGenerate(title, words, gridSize, directions);
+    onGenerate(title, words, gridWidth, gridHeight, directions);
   };
 
-  const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (!isNaN(value)) {
-      setGridSize(value);
+      setGridWidth(value);
     } else if (e.target.value === '') {
-      setGridSize(0);
+      setGridWidth(0);
+    }
+  };
+
+  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      setGridHeight(value);
+    } else if (e.target.value === '') {
+      setGridHeight(0);
     }
   };
 
@@ -145,23 +155,37 @@ export const ControlsPanel: React.FC<ControlsPanelProps> = ({ onGenerate, isGene
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="grid-size" className="text-foreground/80">Grid Size (8-40)</Label>
-          <div className="flex items-center gap-3">
-            <Input 
-              id="grid-size" 
-              type="number" 
-              min={8} 
-              max={40} 
-              value={gridSize || ''}
-              onChange={handleSizeChange}
-              className="w-full border-slate-300 focus:ring-primary/20"
-            />
-            <span className="text-muted-foreground font-mono bg-slate-100 px-3 py-2 rounded-md border border-slate-200">
-              {gridSize || '?'} x {gridSize || '?'}
-            </span>
+        <div className="space-y-4">
+          <Label className="text-foreground/80">Grid Dimensions (8-40)</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="grid-width" className="text-[10px] text-muted-foreground uppercase tracking-wider">Width (Cols)</Label>
+              <Input 
+                id="grid-width" 
+                type="number" 
+                min={8} 
+                max={40} 
+                value={gridWidth || ''}
+                onChange={handleWidthChange}
+                className="border-slate-300 focus:ring-primary/20"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="grid-height" className="text-[10px] text-muted-foreground uppercase tracking-wider">Height (Rows)</Label>
+              <Input 
+                id="grid-height" 
+                type="number" 
+                min={8} 
+                max={40} 
+                value={gridHeight || ''}
+                onChange={handleHeightChange}
+                className="border-slate-300 focus:ring-primary/20"
+              />
+            </div>
           </div>
-          <p className="text-[10px] text-muted-foreground pl-1">Min: 8, Max: 40. Standard is 15.</p>
+          <div className="bg-slate-100 px-3 py-2 rounded-md border border-slate-200 text-center font-mono text-muted-foreground">
+            {gridWidth || '?'} × {gridHeight || '?'}
+          </div>
         </div>
 
         <Button 

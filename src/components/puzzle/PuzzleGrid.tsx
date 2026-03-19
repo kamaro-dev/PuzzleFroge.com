@@ -11,7 +11,9 @@ interface PuzzleGridProps {
 }
 
 export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, wordPositions }) => {
-  const size = grid.length;
+  const rows = grid.length;
+  const cols = grid[0]?.length || 0;
+  const maxDim = Math.max(rows, cols);
 
   // Create a map of row-col to identify highlighted cells
   const highlightedCells = new Set<string>();
@@ -32,13 +34,12 @@ export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, word
   /**
    * Generates sizing classes based on grid density.
    * We use fixed widths to prevent squashing (horizontal distortion).
-   * The parent container handles horizontal scrolling for responsive support.
    */
   const getCellClasses = () => {
-    if (size <= 10) return "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-lg sm:text-xl md:text-2xl";
-    if (size <= 15) return "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-base sm:text-lg md:text-xl";
-    if (size <= 20) return "w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-sm sm:text-base md:text-lg";
-    if (size <= 30) return "w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-xs sm:text-sm md:text-base";
+    if (maxDim <= 10) return "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-lg sm:text-xl md:text-2xl";
+    if (maxDim <= 15) return "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-base sm:text-lg md:text-xl";
+    if (maxDim <= 20) return "w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-sm sm:text-base md:text-lg";
+    if (maxDim <= 30) return "w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-xs sm:text-sm md:text-base";
     return "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[10px] sm:text-xs md:text-sm";
   };
 
@@ -46,8 +47,7 @@ export const PuzzleGrid: React.FC<PuzzleGridProps> = ({ grid, showSolution, word
     <div 
       className="grid bg-slate-200 p-[1px] rounded-lg shadow-inner mx-auto w-fit"
       style={{ 
-        // Using 'auto' prevents the columns from squashing into a fixed width
-        gridTemplateColumns: `repeat(${size}, auto)`,
+        gridTemplateColumns: `repeat(${cols}, auto)`,
         gap: '1px'
       }}
     >

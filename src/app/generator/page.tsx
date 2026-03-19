@@ -22,12 +22,12 @@ export default function GeneratorPage() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleGenerate = useCallback((newTitle: string, words: string[], size: number, options: DirectionOptions) => {
+  const handleGenerate = useCallback((newTitle: string, words: string[], width: number, height: number, options: DirectionOptions) => {
     setError(null);
     
     // Grid Size Validation
-    if (isNaN(size) || size < 8 || size > 40) {
-      setError("Please enter a grid size between 8 and 40.");
+    if (isNaN(width) || width < 8 || width > 40 || isNaN(height) || height < 8 || height > 40) {
+      setError("Please enter a width and height between 8 and 40.");
       return;
     }
 
@@ -52,9 +52,9 @@ export default function GeneratorPage() {
     }
 
     // Word Length Validation
-    const tooLongWords = uniqueWords.filter(w => w.length > size);
+    const tooLongWords = uniqueWords.filter(w => w.length > width && w.length > height);
     if (tooLongWords.length > 0) {
-      setError(`The following words are too long for a ${size}x${size} grid: ${tooLongWords.join(', ')}`);
+      setError(`The following words are too long for a ${width}x${height} grid: ${tooLongWords.join(', ')}`);
       return;
     }
 
@@ -62,7 +62,7 @@ export default function GeneratorPage() {
     // Simulate generation delay for UX feel
     setTimeout(() => {
       try {
-        const data = generateWordSearchPuzzleAlgorithm(uniqueWords, size, options);
+        const data = generateWordSearchPuzzleAlgorithm(uniqueWords, width, height, options);
         setPuzzle(data);
         setTitle(newTitle || 'Word Search');
         setShowSolution(false);
@@ -84,7 +84,8 @@ export default function GeneratorPage() {
       words: puzzle.wordPositions.map(p => p.word),
       wordPositions: puzzle.wordPositions,
       showSolution: type === 'solution',
-      size: puzzle.size
+      width: puzzle.width,
+      height: puzzle.height
     }, filename);
   };
 
@@ -115,7 +116,7 @@ export default function GeneratorPage() {
                       <LayoutGrid className="w-16 h-16 text-muted/30 mx-auto mb-4" />
                       <h2 className="text-2xl font-bold text-foreground mb-2">Ready to Forge?</h2>
                       <p className="text-muted-foreground">
-                        Enter your words, choose directions, and set your grid size to create your custom Word Search puzzle.
+                        Enter your words, choose directions, and set your grid dimensions to create your custom Word Search puzzle.
                       </p>
                     </div>
                   </div>
