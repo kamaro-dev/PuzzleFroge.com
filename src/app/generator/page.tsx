@@ -8,10 +8,10 @@ import { PuzzleGrid } from '@/components/puzzle/PuzzleGrid';
 import { WordList } from '@/components/puzzle/WordList';
 import { AdBanner } from '@/components/layout/AdBanner';
 import { generateWordSearchPuzzleAlgorithm, PuzzleData, DirectionOptions } from '@/utils/puzzleGenerator';
-import { exportToPNG } from '@/utils/exportImage';
+import { exportToPNG, exportToPDF } from '@/utils/exportImage';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Download, Eye, EyeOff, LayoutGrid, Printer } from 'lucide-react';
+import { AlertCircle, Download, Eye, EyeOff, LayoutGrid, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function GeneratorPage() {
@@ -25,20 +25,17 @@ export default function GeneratorPage() {
   const handleGenerate = useCallback((newTitle: string, words: string[], width: number, height: number, options: DirectionOptions) => {
     setError(null);
     
-    // Grid Size Validation
     if (isNaN(width) || width < 8 || width > 40 || isNaN(height) || height < 8 || height > 40) {
       setError("Please enter a width and height between 8 and 40.");
       return;
     }
 
-    // Direction Selection Validation
     const anyDirectionSelected = Object.values(options).some(val => val === true);
     if (!anyDirectionSelected) {
       setError("Please select at least one word direction.");
       return;
     }
 
-    // Empty Word List Validation
     if (words.length === 0) {
       setError("Please enter at least one word to include in the puzzle.");
       return;
@@ -46,13 +43,9 @@ export default function GeneratorPage() {
 
     const uniqueWords = Array.from(new Set(words));
     if (uniqueWords.length !== words.length) {
-      toast({
-        title: "Duplicates Removed",
-        description: "We automatically removed duplicate words from your list.",
-      });
+      toast({ title: "Duplicates Removed", description: "We automatically removed duplicate words from your list." });
     }
 
-    // Word Length Validation
     const tooLongWords = uniqueWords.filter(w => w.length > width && w.length > height);
     if (tooLongWords.length > 0) {
       setError(`The following words are too long for a ${width}x${height} grid: ${tooLongWords.join(', ')}`);
@@ -60,7 +53,6 @@ export default function GeneratorPage() {
     }
 
     setIsGenerating(true);
-    // Simulate generation delay for UX feel
     setTimeout(() => {
       try {
         const data = generateWordSearchPuzzleAlgorithm(uniqueWords, width, height, options);
@@ -75,11 +67,9 @@ export default function GeneratorPage() {
     }, 500);
   }, [toast]);
 
-  const handleExport = (type: 'puzzle' | 'solution') => {
-    if (!puzzle) return;
-    
-    const filename = `${title.toLowerCase().replace(/\s+/g, '-')}-${type}`;
-    exportToPNG({
+  const getExportOptions = (type: 'puzzle' | 'solution') => {
+    if (!puzzle) return null;
+    return {
       title,
       grid: puzzle.grid,
       words: puzzle.wordPositions.map(p => p.word),
@@ -87,7 +77,21 @@ export default function GeneratorPage() {
       showSolution: type === 'solution',
       width: puzzle.width,
       height: puzzle.height
-    }, filename);
+    };
+  };
+
+  const handleExportPNG = (type: 'puzzle' | 'solution') => {
+    const opts = getExportOptions(type);
+    if (!opts) return;
+    const filename = `${title.toLowerCase().replace(/\s+/g, '-')}-${type}`;
+    exportToPNG(opts, filename);
+  };
+
+  const handleExportPDF = (type: 'puzzle' | 'solution') => {
+    const opts = getExportOptions(type);
+    if (!opts) return;
+    const filename = `${title.toLowerCase().replace(/\s+/g, '-')}-${type}`;
+    exportToPDF(opts, filename);
   };
 
   return (
@@ -117,7 +121,7 @@ export default function GeneratorPage() {
                       <LayoutGrid className="w-16 h-16 text-muted/30 mx-auto mb-4" />
                       <h2 className="text-2xl font-bold text-foreground mb-2">Ready to Forge?</h2>
                       <p className="text-muted-foreground">
-                        Enter your words, choose directions, and set your grid dimensions to create your custom Word Search puzzle.
+                        Enter your words, pick a difficulty level, and set your grid size to generate a professional word search puzzle.
                       </p>
                     </div>
                   </div>
@@ -159,22 +163,43 @@ export default function GeneratorPage() {
 
                     <WordList words={puzzle.wordPositions.map(p => p.word)} />
 
-                    <div className="mt-12 pt-8 border-t grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Button 
-                        onClick={() => handleExport('puzzle')}
-                        className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-2 h-12"
-                      >
-                        <Download className="w-5 h-5" />
-                        Download Puzzle PNG
-                      </Button>
-                      <Button 
-                        variant="secondary"
-                        onClick={() => handleExport('solution')}
-                        className="bg-secondary text-secondary-foreground hover:bg-secondary/80 flex items-center justify-center gap-2 h-12"
-                      >
-                        <Printer className="w-5 h-5" />
-                        Download Solution PNG
-                      </Button>
+                    <div className="mt-12 pt-8 border-t">
+                      <p className="text-xs text-muted-foreground text-center mb-4 uppercase tracking-widest font-medium">Download Puzzle</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                        <Button 
+                          onClick={() => handleExportPNG('puzzle')}
+                          className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-2 h-11"
+                        >
+                          <Download className="w-4 h-4" />
+                          PNG — Puzzle
+                        </Button>
+                        <Button 
+                          onClick={() => handleExportPDF('puzzle')}
+                          className="bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center gap-2 h-11"
+                        >
+                          <FileText className="w-4 h-4" />
+                          PDF — Puzzle
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center mb-4 uppercase tracking-widest font-medium">Download Solution</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleExportPNG('solution')}
+                          className="flex items-center justify-center gap-2 h-11"
+                        >
+                          <Download className="w-4 h-4" />
+                          PNG — Solution
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleExportPDF('solution')}
+                          className="flex items-center justify-center gap-2 h-11"
+                        >
+                          <FileText className="w-4 h-4" />
+                          PDF — Solution
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
