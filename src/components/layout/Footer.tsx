@@ -1,26 +1,26 @@
 import React from 'react';
+import Link from 'next/link';
 
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-white border-t py-12">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-bold text-primary mb-2">PuzzleForge</h3>
-            <p className="text-sm text-muted-foreground">
-              The fastest way to generate printable word search puzzles for your classroom, book, or hobby.
-            </p>
-          </div>
-          
-          <div className="flex gap-8 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-primary transition-colors">Terms</a>
-            <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-            <a href="#" className="hover:text-primary transition-colors">Contact</a>
-          </div>
+      <div className="container mx-auto px-4 flex flex-col items-center text-center">
+        <div className="mb-8">
+          <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Puzzlfo</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
+            The free online platform to create printable puzzles such as word searches, Sudoku, and more.
+          </p>
         </div>
         
-        <div className="mt-12 pt-8 border-t text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} PuzzleForge. Created with passion for puzzle lovers.
+        <div className="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-600 mb-8">
+          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <Link href="/about" className="hover:text-primary transition-colors">About</Link>
+          <Link href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+          <Link href="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
+        </div>
+        
+        <div className="w-full max-w-lg border-t border-slate-100 pt-8 text-xs text-slate-400">
+          © 2026 Puzzlfo
         </div>
       </div>
     </footer>
