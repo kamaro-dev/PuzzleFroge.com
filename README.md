@@ -1,4 +1,4 @@
-# PuzzleFroge.com
+# PuzzlFo.com
 
 Welcome to your new developer home! Your Firebase Studio project has been successfully migrated to Antigravity.
 
