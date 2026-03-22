@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'PuzzleForge - Free Word Search Generator',
+  title: 'Puzzlfo.com - Free Word Search Generator',
   description: 'Generate and export printable word search puzzles for free.',
 };
 

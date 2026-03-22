@@ -1,4 +1,4 @@
-# **App Name**: PuzzleForge
+# **App Name**: Puzzlfo.com
 
 ## Core Features:
 
