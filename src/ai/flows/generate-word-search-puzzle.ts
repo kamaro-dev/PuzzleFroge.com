@@ -79,7 +79,9 @@ const generateWordSearchPuzzleFlow = ai.defineFlow(
 
     const { grid, wordPositions } = generateWordSearchPuzzleAlgorithm(
       input.words.map(w => w.toUpperCase()),
-      input.gridSize
+      input.gridSize,
+      input.gridSize,
+      { right: true, left: true, down: true, up: true, downRight: true, downLeft: true, upRight: true, upLeft: true }
     );
 
     return {

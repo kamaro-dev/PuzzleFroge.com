@@ -2,8 +2,8 @@ import type {Metadata} from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Puzzlfo.com - Free Word Search Generator',
-  description: 'Generate and export printable word search puzzles for free.',
+  title: 'Puzzlfo – Free Puzzle Generator',
+  description: 'Create custom puzzles online including word search, sudoku, and more. Download printable PDF or PNG for free.',
 };
 
 export default function RootLayout({
